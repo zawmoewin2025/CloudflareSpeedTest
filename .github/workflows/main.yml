@@ -1,0 +1,37 @@
+name: Daily Cloudflare IP Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # နေ့တိုင်း မြန်မာစံတော်ချိန် မနက် ၆:၃၀ မှာ run ပါမယ်
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install CloudflareSpeedTest
+        run: |
+          go build -o cfst main.go
+
+      - name: Run Scanner
+        run: |
+          # Port 443 ကို အဓိကထား စစ်ဆေးပါမယ်
+          ./cfst -tp 443 -n 500 -tl 200 -o result.csv
+
+      - name: Commit and Push Results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add result.csv
+          git commit -m "Update Daily Clean IP [$(date)]" || exit 0
+          git push
+
+
