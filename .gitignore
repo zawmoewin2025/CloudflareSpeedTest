@@ -1,4 +1,7 @@
-dist
-Releases
-*.exe
-*.csv
+      - name: Commit and Push Results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f result.csv # -f ထည့်လိုက်ခြင်းဖြင့် gitignore ကို ကျော်ခိုင်းတာပါ
+          git commit -m "Update Daily Clean IP [$(date)]" || exit 0
+          git push
